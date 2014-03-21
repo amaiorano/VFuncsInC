@@ -37,7 +37,6 @@ float Base::Func2(int arg1)
 }
 
 
-
 class ChildOne : public Base
 {
 public:
@@ -64,7 +63,6 @@ void ChildOne::Func1()
 {
 	printf("ChildOne::Func1\n");
 }
-
 
 
 class ChildTwo : public ChildOne
@@ -96,8 +94,6 @@ float ChildTwo::Func2(int arg1)
 	printf("ChildTwo::Func2 arg1=%d\n", arg1);
 	return 1.0f;
 }
-
-
 
 
 int main()

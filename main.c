@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
-typedef enum
+enum
 {
 	CLASS_BASE,
 	CLASS_CHILDONE,
@@ -10,7 +11,7 @@ typedef enum
 	NUM_CLASSES
 };
 
-typedef enum
+enum
 {
 	VFUNC_DESTRUCTOR,
 	VFUNC_FUNC1,
@@ -198,7 +199,6 @@ void InitTables()
 int main()
 {
 	Base* pBase;
-	char test[128];
 
 	// In C++, the vtables are built by the compiler and laid out in the executable already. In C,
 	// we need to allocate and build them at runtime.
