@@ -20,23 +20,21 @@ enum
 	NUM_VFUNCS
 };
 
-typedef void (*Constructor)(void*);
 typedef void (*Destructor)(void*);
 typedef void (*Func1)();
 typedef	float (*Func2)(int arg1);
 
 ptrdiff_t*** g_allVTables = NULL;
-ptrdiff_t** g_allConstructors = NULL;
 
 
 // Base
 
 typedef struct
 {
+	ptrdiff_t** vtable;
+
 	int a;
 	float b;
-
-	ptrdiff_t** vtable;
 } Base;
 
 void Base_Construct(Base* pThis)
@@ -73,7 +71,7 @@ typedef struct
 
 void ChildOne_Construct(ChildOne* pThis)
 {
-	((Constructor)(g_allConstructors[CLASS_BASE]))(pThis); // Compiler would inject this here
+	Base_Construct((Base*)pThis); // Compiler would inject this here
 
 	printf("ChildOne_Construct\n");
 	pThis->c = 0;
@@ -83,7 +81,7 @@ void ChildOne_Destruct(ChildOne* pThis)
 {
 	printf("ChildOne_Destruct\n");
 	
-	((Destructor)g_allVTables[CLASS_BASE][VFUNC_DESTRUCTOR])(pThis); // Compiler would inject this here
+	Base_Destruct((Base*)pThis); // Compiler would inject this here
 }
 
 void ChildOne_Func1()
@@ -103,7 +101,7 @@ typedef struct
 
 void ChildTwo_Construct(ChildTwo* pThis)
 {
-	((Constructor)(g_allConstructors[CLASS_CHILDONE]))(pThis); // Compiler would inject this here
+	ChildOne_Construct((ChildOne*)pThis); // Compiler would inject this here
 
 	printf("ChildTwo_Construct\n");
 	pThis->c = 0;
@@ -114,7 +112,7 @@ void ChildTwo_Destruct(ChildTwo* pThis)
 {
 	printf("ChildTwo_Destruct\n");
 
-	((Destructor)g_allVTables[CLASS_CHILDONE][VFUNC_DESTRUCTOR])(pThis); // Compiler would inject this here
+	ChildOne_Destruct((ChildOne*)pThis); // Compiler would inject this here
 }
 
 float ChildTwo_Func2(int arg1)
@@ -130,7 +128,7 @@ Base* NewBase()
 {
 	Base* pInstance = (Base*)malloc(sizeof(Base));
 	pInstance->vtable = g_allVTables[CLASS_BASE];
-	((Constructor)(g_allConstructors[CLASS_BASE]))(pInstance);
+	Base_Construct(pInstance);
 	return pInstance;
 }
 
@@ -138,7 +136,7 @@ ChildOne* NewChildOne()
 {
 	ChildOne* pInstance = (ChildOne*)malloc(sizeof(ChildOne));
 	((Base*)pInstance)->vtable = g_allVTables[CLASS_CHILDONE];
-	((Constructor)(g_allConstructors[CLASS_CHILDONE]))(pInstance);
+	ChildOne_Construct(pInstance);
 	return pInstance;
 }
 
@@ -146,7 +144,7 @@ ChildTwo* NewChildTwo()
 {
 	ChildTwo* pInstance = (ChildTwo*)malloc(sizeof(ChildTwo));
 	((Base*)pInstance)->vtable = g_allVTables[CLASS_CHILDTWO];
-	((Constructor)(g_allConstructors[CLASS_CHILDTWO]))(pInstance);
+	ChildTwo_Construct(pInstance);
 	return pInstance;
 }
 
@@ -187,12 +185,6 @@ void InitTables()
 	g_allVTables[CLASS_CHILDTWO][VFUNC_DESTRUCTOR] = (ptrdiff_t*)&ChildTwo_Destruct;
 	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC1] = (ptrdiff_t*)&ChildOne_Func1;
 	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC2] = (ptrdiff_t*)&ChildTwo_Func2;
-
-	// For each class, we also store a pointer to the class constructor
-	g_allConstructors = (ptrdiff_t**)malloc( sizeof(ptrdiff_t**) * NUM_CLASSES );
-	g_allConstructors[CLASS_BASE] = (ptrdiff_t*)&Base_Construct;
-	g_allConstructors[CLASS_CHILDONE] = (ptrdiff_t*)&ChildOne_Construct;
-	g_allConstructors[CLASS_CHILDTWO] = (ptrdiff_t*)&ChildTwo_Construct;
 }
 
 
