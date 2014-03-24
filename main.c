@@ -187,6 +187,18 @@ void InitTables()
 	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC2] = (ptrdiff_t*)&ChildTwo_Func2;
 }
 
+void DeleteTables()
+{
+	int i;
+
+	for (i = 0; i < NUM_CLASSES; ++i)
+	{
+		free(g_allVTables[i]);
+	}
+
+	free(g_allVTables);
+	g_allVTables = NULL;
+}
 
 int main()
 {
@@ -214,4 +226,6 @@ int main()
 	((Func1)pBase->vtable[VFUNC_FUNC1])();		// pBase->Func1();
 	((Func2)pBase->vtable[VFUNC_FUNC2])(13);	// pBase->Func2(13);
 	DeleteBase(pBase);							// delete pBase;
+
+	DeleteTables();
 }
