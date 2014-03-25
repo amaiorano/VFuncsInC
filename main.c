@@ -168,7 +168,7 @@ void InitTables()
 	// of virtual functions for each class.
 	for (i = 0; i < NUM_CLASSES; ++i)
 	{
-		g_allVTables[i] = (ptrdiff_t**)malloc(sizeof(ptrdiff_t**) * NUM_VFUNCS);
+		g_allVTables[i] = (ptrdiff_t**)malloc(sizeof(ptrdiff_t*) * NUM_VFUNCS);
 	}
 
 	// Populate Base vtable entries
