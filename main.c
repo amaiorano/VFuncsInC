@@ -22,7 +22,7 @@ enum
 
 typedef void (*Destructor)(void*);
 typedef void (*Func1)();
-typedef    float (*Func2)(int arg1);
+typedef float (*Func2)(int arg1);
 
 void*** g_allVTables = NULL;
 
