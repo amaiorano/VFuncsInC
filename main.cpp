@@ -3,14 +3,13 @@
 class Base
 {
 public:
-	int a;
-	float b;
-
 	Base();
 	virtual ~Base();
-
 	virtual void Func1();
 	virtual float Func2(int arg1);
+
+	int a;
+	float b;
 };
 
 Base::Base()
@@ -40,12 +39,11 @@ float Base::Func2(int arg1)
 class ChildOne : public Base
 {
 public:
-	char c;
-
 	ChildOne();
 	virtual ~ChildOne();
-
 	virtual void Func1();
+
+	char c;
 };
 
 ChildOne::ChildOne()
@@ -68,13 +66,12 @@ void ChildOne::Func1()
 class ChildTwo : public ChildOne
 {
 public:
-	short c;
-	short d;
-
 	ChildTwo();
 	virtual ~ChildTwo();
-
 	virtual float Func2(int arg1);
+
+	short c;
+	short d;
 };
 
 ChildTwo::ChildTwo()

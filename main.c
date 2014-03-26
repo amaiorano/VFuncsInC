@@ -24,15 +24,14 @@ typedef void (*Destructor)(void*);
 typedef void (*Func1)();
 typedef	float (*Func2)(int arg1);
 
-ptrdiff_t*** g_allVTables = NULL;
+void*** g_allVTables = NULL;
 
 
 // Base
 
 typedef struct
 {
-	ptrdiff_t** vtable;
-
+	void** vtable;
 	int a;
 	float b;
 } Base;
@@ -157,37 +156,37 @@ void DeleteBase(Base* pThis)
 	}
 }
 
-void InitTables()
+void InitVTables()
 {
 	int i;
 
 	// We need a pointer to a vtable per class
-	g_allVTables = (ptrdiff_t***)malloc( sizeof(ptrdiff_t**) * NUM_CLASSES );
+	g_allVTables = (void***)malloc( sizeof(void**) * NUM_CLASSES );
 	
 	// For each class, we allocate vtable - in our case, it's simple as we have a fixed number
 	// of virtual functions for each class.
 	for (i = 0; i < NUM_CLASSES; ++i)
 	{
-		g_allVTables[i] = (ptrdiff_t**)malloc(sizeof(ptrdiff_t*) * NUM_VFUNCS);
+		g_allVTables[i] = (void**)malloc(sizeof(void*) * NUM_VFUNCS);
 	}
 
 	// Populate Base vtable entries
-	g_allVTables[CLASS_BASE][VFUNC_DESTRUCTOR] = (ptrdiff_t*)&Base_Destruct;
-	g_allVTables[CLASS_BASE][VFUNC_FUNC1] = (ptrdiff_t*)&Base_Func1;
-	g_allVTables[CLASS_BASE][VFUNC_FUNC2] = (ptrdiff_t*)&Base_Func2;
+	g_allVTables[CLASS_BASE][VFUNC_DESTRUCTOR] = (void*)&Base_Destruct;
+	g_allVTables[CLASS_BASE][VFUNC_FUNC1] = (void*)&Base_Func1;
+	g_allVTables[CLASS_BASE][VFUNC_FUNC2] = (void*)&Base_Func2;
 
 	// Populate ChildOne vtable entries
-	g_allVTables[CLASS_CHILDONE][VFUNC_DESTRUCTOR] = (ptrdiff_t*)&ChildOne_Destruct;
-	g_allVTables[CLASS_CHILDONE][VFUNC_FUNC1] = (ptrdiff_t*)&ChildOne_Func1;
-	g_allVTables[CLASS_CHILDONE][VFUNC_FUNC2] = (ptrdiff_t*)&Base_Func2;
+	g_allVTables[CLASS_CHILDONE][VFUNC_DESTRUCTOR] = (void*)&ChildOne_Destruct;
+	g_allVTables[CLASS_CHILDONE][VFUNC_FUNC1] = (void*)&ChildOne_Func1;
+	g_allVTables[CLASS_CHILDONE][VFUNC_FUNC2] = (void*)&Base_Func2;
 
 	// Populate ChildTwo vtable entries
-	g_allVTables[CLASS_CHILDTWO][VFUNC_DESTRUCTOR] = (ptrdiff_t*)&ChildTwo_Destruct;
-	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC1] = (ptrdiff_t*)&ChildOne_Func1;
-	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC2] = (ptrdiff_t*)&ChildTwo_Func2;
+	g_allVTables[CLASS_CHILDTWO][VFUNC_DESTRUCTOR] = (void*)&ChildTwo_Destruct;
+	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC1] = (void*)&ChildOne_Func1;
+	g_allVTables[CLASS_CHILDTWO][VFUNC_FUNC2] = (void*)&ChildTwo_Func2;
 }
 
-void DeleteTables()
+void DeleteVTables()
 {
 	int i;
 
@@ -206,7 +205,7 @@ int main()
 
 	// In C++, the vtables are built by the compiler and laid out in the executable already. In C,
 	// we need to allocate and build them at runtime.
-	InitTables();
+	InitVTables();
 
 	pBase = NewBase();							// pBase = new Base();
 	((Func1)pBase->vtable[VFUNC_FUNC1])();		// pBase->Func1();
@@ -227,5 +226,5 @@ int main()
 	((Func2)pBase->vtable[VFUNC_FUNC2])(13);	// pBase->Func2(13);
 	DeleteBase(pBase);							// delete pBase;
 
-	DeleteTables();
+	DeleteVTables();
 }
