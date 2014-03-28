@@ -38,6 +38,7 @@ typedef struct
 
 void Base_Construct(Base* pThis)
 {
+    pThis->vtable = g_allVTables[CLASS_BASE];
     printf("Base_Construct\n");
     pThis->a = 0;
     pThis->b = 0.f;
@@ -70,7 +71,8 @@ typedef struct
 
 void ChildOne_Construct(ChildOne* pThis)
 {
-    Base_Construct((Base*)pThis); // Compiler would inject this here
+    Base_Construct((Base*)pThis);
+    ((Base*)pThis)->vtable = g_allVTables[CLASS_CHILDONE];
 
     printf("ChildOne_Construct\n");
     pThis->c = 0;
@@ -80,7 +82,7 @@ void ChildOne_Destruct(ChildOne* pThis)
 {
     printf("ChildOne_Destruct\n");
     
-    Base_Destruct((Base*)pThis); // Compiler would inject this here
+    Base_Destruct((Base*)pThis);    
 }
 
 void ChildOne_Func1()
@@ -100,7 +102,8 @@ typedef struct
 
 void ChildTwo_Construct(ChildTwo* pThis)
 {
-    ChildOne_Construct((ChildOne*)pThis); // Compiler would inject this here
+    ChildOne_Construct((ChildOne*)pThis);
+    ((Base*)pThis)->vtable = g_allVTables[CLASS_CHILDTWO];
 
     printf("ChildTwo_Construct\n");
     pThis->c = 0;
@@ -111,7 +114,7 @@ void ChildTwo_Destruct(ChildTwo* pThis)
 {
     printf("ChildTwo_Destruct\n");
 
-    ChildOne_Destruct((ChildOne*)pThis); // Compiler would inject this here
+    ChildOne_Destruct((ChildOne*)pThis);    
 }
 
 float ChildTwo_Func2(int arg1)
@@ -126,7 +129,6 @@ float ChildTwo_Func2(int arg1)
 Base* NewBase()
 {
     Base* pInstance = (Base*)malloc(sizeof(Base));
-    pInstance->vtable = g_allVTables[CLASS_BASE];
     Base_Construct(pInstance);
     return pInstance;
 }
@@ -134,7 +136,6 @@ Base* NewBase()
 ChildOne* NewChildOne()
 {
     ChildOne* pInstance = (ChildOne*)malloc(sizeof(ChildOne));
-    ((Base*)pInstance)->vtable = g_allVTables[CLASS_CHILDONE];
     ChildOne_Construct(pInstance);
     return pInstance;
 }
@@ -142,7 +143,6 @@ ChildOne* NewChildOne()
 ChildTwo* NewChildTwo()
 {
     ChildTwo* pInstance = (ChildTwo*)malloc(sizeof(ChildTwo));
-    ((Base*)pInstance)->vtable = g_allVTables[CLASS_CHILDTWO];
     ChildTwo_Construct(pInstance);
     return pInstance;
 }
