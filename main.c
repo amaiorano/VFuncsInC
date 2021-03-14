@@ -24,7 +24,7 @@ typedef void (*Destructor)(void*);
 typedef void (*Func1)();
 typedef float (*Func2)(int arg1);
 
-void*** g_allVTables = NULL;
+void (***g_allVTables)(void) = NULL;
 
 
 // Base
@@ -46,6 +46,7 @@ void Base_Construct(Base* pThis)
 
 void Base_Destruct(Base* pThis)
 {
+    pThis->vtable = g_allVTables[CLASS_BASE];
     printf("Base_Destruct\n");
 }
 
@@ -80,6 +81,7 @@ void ChildOne_Construct(ChildOne* pThis)
 
 void ChildOne_Destruct(ChildOne* pThis)
 {
+    ((Base*)pThis)->vtable = g_allVTables[CLASS_CHILDONE];
     printf("ChildOne_Destruct\n");
     
     Base_Destruct((Base*)pThis);    
@@ -112,6 +114,7 @@ void ChildTwo_Construct(ChildTwo* pThis)
 
 void ChildTwo_Destruct(ChildTwo* pThis)
 {
+    ((Base*)pThis)->vtable = g_allVTables[CLASS_CHILDTWO];
     printf("ChildTwo_Destruct\n");
 
     ChildOne_Destruct((ChildOne*)pThis);    
@@ -161,7 +164,7 @@ void InitVTables()
     int i;
 
     // We need a pointer to a vtable per class
-    g_allVTables = (void***)malloc( sizeof(void**) * NUM_CLASSES );
+    g_allVTables = (void (***)(void))malloc( sizeof(void**) * NUM_CLASSES );
     
     // For each class, we allocate vtable - in our case, it's simple as we have a fixed number
     // of virtual functions for each class.
